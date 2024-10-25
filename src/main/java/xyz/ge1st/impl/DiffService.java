@@ -15,12 +15,12 @@ public class DiffService {
     public String compareSpecs(DiffRequest diffRequest) {
 
         // 1 Decode from Base64
-        String sourceSpec = new String(Base64.getDecoder().decode(diffRequest.getSourceSpec()), StandardCharsets.UTF_8);
-        String targetSpec = new String(Base64.getDecoder().decode(diffRequest.getTargetSpec()), StandardCharsets.UTF_8);
+        String sourceSpec = new String(Base64.getDecoder().decode(diffRequest.sourceSpec()), StandardCharsets.UTF_8);
+        String targetSpec = new String(Base64.getDecoder().decode(diffRequest.targetSpec()), StandardCharsets.UTF_8);
 
         ChangedOpenApi changedOpenApi = OpenApiCompare.fromContents(sourceSpec, targetSpec);
 
-        if (diffRequest.isUseMarkdown()) {
+        if (diffRequest.useMarkdown()) {
 
             String result = new MarkdownRender().render(changedOpenApi);
 
