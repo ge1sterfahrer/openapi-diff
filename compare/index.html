@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare OpenAPI Specs</title>
+    <link rel="stylesheet" href="styles-dark.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Compare OpenAPI Specifications</h1>
+
+    <label for="newSpec">New Spec (OpenAPI JSON or YAML):</label>
+    <textarea id="newSpec" placeholder="Paste your new OpenAPI specification here..."></textarea>
+
+    <label for="currentSpec">Current Spec (OpenAPI JSON or YAML):</label>
+    <textarea id="currentSpec" placeholder="Paste your current OpenAPI specification here..."></textarea>
+
+    <div class="button-container">
+        <button id="compareBtn">Compare</button>
+    </div>
+
+    <!-- Placeholder for the result to be displayed -->
+    <div id="result" class="result-box" hidden></div>
+</div>
+
+<script>
+
+    function adjustHeight(element) {
+        element.style.height = 'auto';  // Reset height to auto to allow shrinking
+        element.style.height = (element.scrollHeight) + 'px';  // Set height to the scroll height
+    }
+
+    document.getElementById('compareBtn').addEventListener('click', function() {
+        const newSpec = document.getElementById('newSpec').value;
+        const currentSpec = document.getElementById('currentSpec').value;
+
+        if (!newSpec || !currentSpec) {
+            alert("Please provide both the New Spec and Current Spec.");
+            return;
+        }
+
+        // Encode the content to base64
+        const newSpecBase64 = btoa(newSpec);
+        const currentSpecBase64 = btoa(currentSpec);
+
+        // Prepare the data to send
+        const payload = {
+            sourceSpec: newSpecBase64,
+            targetSpec: currentSpecBase64,
+            useMarkdown: false
+        };
+
+        // Send the data to the /diff endpoint (assuming POST)
+        fetch('/diff', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Markdown': 'false'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.text())
+            .then(result => {
+
+                const resultTextArea = document.getElementById('result');
+                resultTextArea.innerHTML = result || 'No differences found'; // Display markdown as plain text
+                resultTextArea.style.display = 'block'; // Make the text area visible
+                // adjustHeight(resultTextArea);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+
+</body>
+</html>
